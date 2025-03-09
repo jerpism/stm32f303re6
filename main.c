@@ -3,22 +3,26 @@
 #include <rcc.h>
 #include <usart.h>
 #include <common.h>
+#include <systick.h>
+
+static int ledstate = 0;
+void systick_handler(void){
+    if(ledstate){
+        led_off();
+        ledstate = 0;
+    }else{
+        led_on();
+        ledstate = 1;
+    }
+
+}
 
 void main(void) {
     test_enable_rcc();
     init_led();
-    test_usart_set_pins();
-    uart_init(9600);
+    systick_init(8000000 / 2); // tick once every second
 
-    for(;;){
-        uart_send('A');
-//        spin(99);
-//        led_on();
-//        spin(999999);
-//        led_off();
-        spin(999999);
-
-    }
+    for(;;);
 
     return;
 }
@@ -37,5 +41,5 @@ extern void _estack(void);  // Defined in link.ld
 
 // 16 standard and 91 STM32-specific handlers
 __attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
-    _estack, _reset
+    _estack, _reset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, systick_handler
 };
