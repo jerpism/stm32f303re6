@@ -6,7 +6,7 @@
 #include <systick.h>
 
 static int ledstate = 0;
-void systick_handler(void){
+void SysTick_Handler(void){
     if(ledstate){
         led_off();
         ledstate = 0;
@@ -14,7 +14,6 @@ void systick_handler(void){
         led_on();
         ledstate = 1;
     }
-
 }
 
 void main(void) {
@@ -41,5 +40,5 @@ extern void _estack(void);  // Defined in link.ld
 
 // 16 standard and 91 STM32-specific handlers
 __attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
-    _estack, _reset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, systick_handler
+    _estack, _reset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, SysTick_Handler
 };
