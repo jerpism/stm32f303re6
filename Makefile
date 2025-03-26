@@ -3,7 +3,7 @@ ASM_SOURCES = $(wildcard *.s)
 HEADERS = $(wildcard *.h)
 OBJ = ${C_SOURCES:.c=.o} ${ASM_SOURCES:.s=.o}
 
-CCFLAGS = -nostdlib -mcpu=cortex-m4 -Og -ggdb -I .
+CCFLAGS = -nostdlib -mcpu=cortex-m4 -Og -ggdb -I include/
 
 all: os.bin
 
