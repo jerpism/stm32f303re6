@@ -24,6 +24,11 @@ struct rcc{
 #define RCC_CFGR3_USART1SW_LSE      (2UL << 0)
 #define RCC_CFGR3_USART1SW_HSI      (3UL << 0)
 
+#define RCC_CFGR3_USART2SW_PCLK     (0UL << 16)
+#define RCC_CFGR3_USART2SW_SYSCLK   (1UL << 16)
+#define RCC_CFGR3_USART2SW_LSE      (2UL << 16)
+#define RCC_CFGR3_USART2SW_HSI      (3UL << 16)
+
 
 
 /* AHBENR */
