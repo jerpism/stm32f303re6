@@ -59,15 +59,7 @@ void task_init(void (*handler)(void), uint32_t *p_stack, uint32_t stack_size){
 }
 
 
-//static volatile int led_state = 0;
 void SysTick_Handler(void){
-/*    if(led_state == 0){
-        led_state = 1;
-        led_on();
-    }else{
-        led_state = 0;
-        led_off();
-    }*/
     curr_task = &task_table.tasks[task_table.curr];
     curr_task->status = TASK_STATUS_IDLE;
 
