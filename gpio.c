@@ -35,6 +35,10 @@ void led_off(){
     GPIO(0)->ODR &= ~BIT(5);
 }
 
+void toggle_led(){
+    GPIO(0)->ODR ^= BIT(5);
+}
+
 void init_led(){
     gpio_set_mode(GPIO(0), 5, GPIO_MODE_OUTPUT);
 }
