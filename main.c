@@ -59,7 +59,15 @@ void task_init(void (*handler)(void), uint32_t *p_stack, uint32_t stack_size){
 }
 
 
+//static volatile int led_state = 0;
 void SysTick_Handler(void){
+/*    if(led_state == 0){
+        led_state = 1;
+        led_on();
+    }else{
+        led_state = 0;
+        led_off();
+    }*/
     curr_task = &task_table.tasks[task_table.curr];
     curr_task->status = TASK_STATUS_IDLE;
 
@@ -71,21 +79,30 @@ void SysTick_Handler(void){
     next_task = &task_table.tasks[task_table.curr];
     next_task->status = TASK_STATUS_ACTIVE;
 
-    //ICSR 0xE000ED10
+    //ICSR 0xE000ED04
     //Sets PendSV to pending
-    asm volatile("ldr r0, =0xE000ED10\t\n"
+    asm volatile("ldr r0, =0xE000ED04\t\n"
                  "ldr r1, [r0]\t\n"
-                 "orr r1, #0x10000000\t\n"
-                 "str r1, [r0]\t\n");
+                 "orr r1, %0\t\n"
+                 "str r1, [r0]\t\n"
+                 :
+                 : "i" (1UL << 28));
 
 }
 
 void task1_handler(){
-    while(1);
+    while(1){
+        spin(999999);
+        toggle_led();
+    }
 }
 
 void task2_handler(){
-    while(1);
+    while(1){
+        spin(99999);
+        toggle_led();
+
+    }
 }
 
 void main(void){
@@ -103,7 +120,7 @@ void main(void){
 
 
     init_led();
-    systick_init(8000000 / 10);
+    systick_init(8000000 * 2);
 
     task_init(&task1_handler, stack1, sizeof(stack1));
     task_init(&task2_handler, stack2, sizeof(stack2));
@@ -111,6 +128,10 @@ void main(void){
 
     curr_task = &task_table.tasks[task_table.curr];
 
+    // Set psp to first task stack top
+    asm volatile("msr psp, %0\n\t"
+                 :
+                 : "r" (curr_task->sp+64));
 
     // Thread mode unprivileged with SP_process as current stack
     asm volatile("mov r0, #0x3\t\n"
