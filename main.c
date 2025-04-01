@@ -4,8 +4,7 @@
 #include <usart.h>
 #include <common.h>
 #include <systick.h>
-
-#define MAX_TASKS 16
+#include <task.h>
 
 
 // PendSV 13
@@ -13,74 +12,6 @@
 #define NVIC_IPR0 0xE000E400
 #define NVIC_IPR13 (*((volatile uint32_t*)(NVIC_IPR0 + (0x4 * 13))))
 #define NVIC_IPR14 (*((volatile uint32_t*)(NVIC_IPR0 + (0x4 * 14))))
-
-enum task_status {
-    TASK_STATUS_IDLE = 0,
-    TASK_STATUS_ACTIVE = 1
-};
-
-struct task{
-    volatile uint32_t sp;
-    void (*handler)(void);
-    volatile enum task_status status;
-};
-
-static struct {
-    struct task tasks[MAX_TASKS];
-    volatile uint32_t curr;
-    uint32_t size;
-}task_table;
-
-volatile struct task *curr_task;
-volatile struct task *next_task;
-
-
-static void task_finished(void){
-    while(1);
-}
-
-void task_init(void (*handler)(void), uint32_t *p_stack, uint32_t stack_size){
-
-    if(task_table.size >= MAX_TASKS - 1){
-        return;
-    }
-
-    struct task *p_task = &task_table.tasks[task_table.size];
-    p_task->handler = handler;
-    p_task->sp = (uint32_t)(p_stack+stack_size-16);
-    p_task->status = TASK_STATUS_IDLE;
-
-    p_stack[stack_size-1] = 0x01000000;
-    p_stack[stack_size-2] = (uint32_t)handler;
-    p_stack[stack_size-3] = (uint32_t)&task_finished;
-
-
-    task_table.size++;
-}
-
-
-void SysTick_Handler(void){
-    curr_task = &task_table.tasks[task_table.curr];
-    curr_task->status = TASK_STATUS_IDLE;
-
-    task_table.curr++;
-    if(task_table.curr >= task_table.size){
-        task_table.curr = 0;
-    }
-
-    next_task = &task_table.tasks[task_table.curr];
-    next_task->status = TASK_STATUS_ACTIVE;
-
-    //ICSR 0xE000ED04
-    //Sets PendSV to pending
-    asm volatile("ldr r0, =0xE000ED04\t\n"
-                 "ldr r1, [r0]\t\n"
-                 "orr r1, %0\t\n"
-                 "str r1, [r0]\t\n"
-                 :
-                 : "i" (1UL << 28));
-
-}
 
 void task1_handler(){
     while(1){
@@ -117,21 +48,7 @@ void main(void){
     task_init(&task1_handler, stack1, sizeof(stack1));
     task_init(&task2_handler, stack2, sizeof(stack2));
 
-
-    curr_task = &task_table.tasks[task_table.curr];
-
-    // Set psp to first task stack top
-    asm volatile("msr psp, %0\n\t"
-                 :
-                 : "r" (curr_task->sp+64));
-
-    // Thread mode unprivileged with SP_process as current stack
-    asm volatile("mov r0, #0x3\t\n"
-                 "msr control, r0\t\n");
-
-    asm volatile("ISB");
-
-    curr_task->handler();
+    sched_start();
 
     for(;;);
 
@@ -148,6 +65,7 @@ __attribute__((naked, noreturn)) void _reset(void) {
 }
 extern void _estack(void);  
 extern void PendSV_Handler(void);
+extern void SysTick_Handler(void);
 
 
 __attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
