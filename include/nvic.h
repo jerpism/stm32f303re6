@@ -5,8 +5,8 @@
 
 #define NVIC_IMPLEMENTED 100
 
-#define NVIC_PENDSV     13
-#define NVIC_SYSTICK    14
+#define NVIC_PENDSV     14
+#define NVIC_SYSTICK    15
 
 #define NVIC_IPR_BASE   (0xE000E400)
 
