@@ -5,13 +5,8 @@
 #include <common.h>
 #include <systick.h>
 #include <task.h>
+#include <nvic.h>
 
-
-// PendSV 13
-// SysTick 14
-#define NVIC_IPR0 0xE000E400
-#define NVIC_IPR13 (*((volatile uint32_t*)(NVIC_IPR0 + (0x4 * 13))))
-#define NVIC_IPR14 (*((volatile uint32_t*)(NVIC_IPR0 + (0x4 * 14))))
 
 void task1_handler(){
     while(1){
@@ -34,8 +29,8 @@ void main(void){
 
     // PendSV to lowest priority
     // SysTick to highest priority
-    NVIC_IPR13 = 0xff;
-    NVIC_IPR14 = 0x00;
+    nvic_set_priority(NVIC_PENDSV, 0xff);
+    nvic_set_priority(NVIC_SYSTICK, 0x00);
 
     RCC->CFGR3 |= RCC_CFGR3_USART2SW_HSI;
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
@@ -68,6 +63,6 @@ extern void PendSV_Handler(void);
 extern void SysTick_Handler(void);
 
 
-__attribute__((section(".vectors"))) void (*const tab[16 + 91])(void) = {
+__attribute__((section(".vectors"))) void (*const tab[16 + 84])(void) = {
     _estack, _reset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, PendSV_Handler, SysTick_Handler
 };
