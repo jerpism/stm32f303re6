@@ -1,5 +1,8 @@
 #ifndef RCC_H_
 #define RCC_H_
+
+#include <stdint.h>
+
 struct rcc{
     volatile uint32_t CR;
     volatile uint32_t CFGR;
