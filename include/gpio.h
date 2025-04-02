@@ -2,6 +2,8 @@
 #define GPIO_H_
 #include <stdint.h>
 
+#define GPIO(bank) ((struct gpio*) (0x48000000 + (0x400 * bank)))
+
 struct gpio{
     volatile uint32_t MODER;
     volatile uint32_t OTYPER;

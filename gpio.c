@@ -2,8 +2,6 @@
 #include <common.h>
 #include <gpio.h>
 
-#define GPIO(bank) ((struct gpio*) (0x48000000 + (0x400 * bank)))
-
 
 void gpio_set_mode(struct gpio *gpio, uint8_t pin, enum gpio_mode mode){
     gpio->MODER &= ~(3UL << (pin * 2)); // clear
