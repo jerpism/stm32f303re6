@@ -1,11 +1,12 @@
 #include <gpio.h>
 #include <stdint.h>
 #include <rcc.h>
-#include <usart.h>
 #include <common.h>
 #include <systick.h>
 #include <task.h>
 #include <nvic.h>
+
+#include <usart_mr.h>
 
 
 void task1_handler(){
@@ -36,14 +37,20 @@ void main(void){
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 
+    USART1_Init(); // Alustetaan USART1
+    while(1){
+        spin(999999);
+        USART1_SendString("Kirjoita jotain: \n");
+    }
 
+    /*
     init_led();
     systick_init(8000000 * 2);
 
     task_init(&task1_handler, stack1, sizeof(stack1));
     task_init(&task2_handler, stack2, sizeof(stack2));
 
-    sched_start();
+    sched_start();*/
 
     for(;;);
 
