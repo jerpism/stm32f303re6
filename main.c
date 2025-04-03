@@ -29,8 +29,7 @@ void task1_handler(){
 void task2_handler(){
     while(1){
         disable_irq();
-        spin(99999);
-        uart_sendstr("morojenttes mite hurisee\n");
+        uart_sendstr("Let's all love Lain!\n");
         enable_irq();
 
     }
@@ -49,7 +48,7 @@ void main(void){
 
     
     init_led();
-    systick_init(8000000 / 10);
+    systick_init(8000000 / 100);
 
     task_init(&task1_handler, stack1, sizeof(stack1));
     task_init(&task2_handler, stack2, sizeof(stack2));
