@@ -3,7 +3,9 @@ ASM_SOURCES = $(wildcard *.s)
 HEADERS = $(wildcard *.h)
 OBJ = ${C_SOURCES:.c=.o} ${ASM_SOURCES:.s=.o}
 
-CCFLAGS = -nostdlib -mcpu=cortex-m4 -Og -ggdb -I include/
+CCFLAGS = -nostdlib -mcpu=cortex-m4 -Og -ggdb \
+	  -Wall -Wextra \
+	  -I include/
 
 all: os.bin
 
@@ -13,7 +15,7 @@ flash: all
 os.bin : os.elf 
 	arm-none-eabi-objcopy -O binary $^ $@
 
-os.elf : start.o usart.o  ${OBJ}
+os.elf : ${OBJ}
 	arm-none-eabi-ld -T link.ld $^ -o $@
 
 
