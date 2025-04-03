@@ -6,7 +6,8 @@
 #include <task.h>
 #include <nvic.h>
 
-#include <usart_mr.h>
+//#include <usart_mr.h>
+#include <usart.h>
 
 
 static inline void disable_irq(){
@@ -30,8 +31,8 @@ void task2_handler(){
     while(1){
         disable_irq();
         spin(99999);
-        toggle_led();
-        USART1_SendString("Kirjoita jotain: \n");
+//        toggle_led();
+        uart_sendstr("morojenttes\n");
         enable_irq();
 
     }
@@ -50,11 +51,11 @@ void main(void){
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 
-    USART1_Init(); // Alustetaan USART1
+    uart_init(9600);
 
     
     init_led();
-    systick_init(8000000 * 2);
+    systick_init(8000000 / 10);
 
     task_init(&task1_handler, stack1, sizeof(stack1));
     task_init(&task2_handler, stack2, sizeof(stack2));
