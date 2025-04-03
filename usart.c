@@ -25,7 +25,7 @@ struct uart{
 
 void uart_init(uint32_t baud){
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-
+    RCC->CFGR3 |= RCC_CFGR3_USART2SW_HSI;
 
     //PA2 and PA3 for USART2
     GPIO(0)->MODER |= (2 << (2 * 2)) | (2 << (3 * 2));
