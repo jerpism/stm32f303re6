@@ -6,7 +6,6 @@
 #include <task.h>
 #include <nvic.h>
 
-//#include <usart_mr.h>
 #include <usart.h>
 
 
@@ -31,8 +30,7 @@ void task2_handler(){
     while(1){
         disable_irq();
         spin(99999);
-//        toggle_led();
-        uart_sendstr("morojenttes\n");
+        uart_sendstr("morojenttes mite hurisee\n");
         enable_irq();
 
     }
@@ -46,10 +44,6 @@ void main(void){
     // SysTick to highest priority
     nvic_set_priority(NVIC_PENDSV, 0xff);
     nvic_set_priority(NVIC_SYSTICK, 0x00);
-
-    RCC->CFGR3 |= RCC_CFGR3_USART2SW_HSI;
-    RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
-    RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 
     uart_init(9600);
 
