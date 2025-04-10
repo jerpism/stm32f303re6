@@ -29,6 +29,7 @@ PendSV_Handler:
     ldmia   r0!,{r4-r11}
     msr     psp, r0
 
+    /* Return to thread mode with PSP */
     ldr     r0, =0xFFFFFFFD
 
     cpsie i
