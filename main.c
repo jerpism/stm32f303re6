@@ -19,19 +19,14 @@ static inline void enable_irq(){
 
 void task1_handler(){
     while(1){
-        disable_irq();
         spin(999999);
         toggle_led();
-        enable_irq();
     }
 }
 
 void task2_handler(){
     while(1){
-        disable_irq();
         uart_sendstr("Let's all love Lain!\n");
-        enable_irq();
-
     }
 }
 
