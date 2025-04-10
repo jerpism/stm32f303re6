@@ -47,8 +47,8 @@ void sched_start(){
                  : "r" (curr_task->sp+64));
 
     // Thread mode unprivileged with SP_process as current stack
-    asm volatile("mov r0, #0x3\t\n"
-                 "msr control, r0\t\n");
+    asm volatile("mov r0, #0x3\n\t"
+                 "msr control, r0");
 
     asm volatile("ISB");
 
