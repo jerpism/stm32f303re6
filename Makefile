@@ -1,5 +1,5 @@
-C_SOURCES = $(wildcard *.c)
-ASM_SOURCES = $(wildcard *.s)
+C_SOURCES = $(wildcard src/*.c)
+ASM_SOURCES = $(wildcard src/*.s)
 HEADERS = $(wildcard *.h)
 OBJ = ${C_SOURCES:.c=.o} ${ASM_SOURCES:.s=.o}
 
