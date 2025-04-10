@@ -8,21 +8,6 @@
  * this will only take into consideration enabling and controlling USART2 */
 #define FREQ 8000000
 
-
-struct uart{
-    volatile uint32_t CR1;
-    volatile uint32_t CR2;
-    volatile uint32_t CR3;
-    volatile uint32_t BRR;
-    volatile uint32_t GTPR;
-    volatile uint32_t RTOR;
-    volatile uint32_t RQR;
-    volatile uint32_t ISR;
-    volatile uint32_t ICR;
-    volatile uint32_t RDR;
-    volatile uint32_t TDR;
-};
-
 void uart_init(uint32_t baud){
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
     RCC->CFGR3 |= RCC_CFGR3_USART2SW_HSI;
