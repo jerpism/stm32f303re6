@@ -2,6 +2,7 @@
 #include <usart.h>
 #include <libc.h>
 #include <task.h>
+#include <gpio.h>
 
 const char *prompt = "\r~$ ";
 
@@ -61,19 +62,19 @@ size_t shell_readinput(uint8_t *buff, size_t size){
 
 void parse_cmd(uint8_t *cmd, size_t n){
     for(size_t i = 0; i < n; ++i){
-        if(cmd[i] == ' ' || cmd[i] == '\n' || cmd[i] == '\r'){
+        if(cmd[i] == '\n' || cmd[i] == '\r'){
             cmd[i] = '\0';
         }
     }
 
     if(strcmp_hack(cmd, "blink") == 0){
         task_enable(0);
-    }else if(strcmp_hack(cmd, "noblink") == 0){
+    }else if(strcmp_hack(cmd, "blinkoff") == 0){
         task_disable(0);
     }else if(strcmp_hack(cmd, "ledon") == 0){
-
+        led_on();
     }else if(strcmp_hack(cmd, "ledoff") == 0){
-
+        led_off();
     }
 
 }
