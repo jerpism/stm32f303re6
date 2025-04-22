@@ -38,17 +38,35 @@ int task_init(void (*handler)(void), uint32_t *stack, uint32_t stack_size){
     return 0;
 }
 
+
+void task_enable(uint32_t n ){
+    if( n > task_table.size){
+        return;
+    }
+    struct task *t = &task_table.tasks[n];
+    t->status = TASK_STATUS_READY;
+}
+
+void task_disable(uint32_t n){
+    if( n > task_table.size){
+        return;
+    }
+    struct task *t = &task_table.tasks[n];
+    t->status = TASK_STATUS_DISABLED;
+    
+}
+
 void sched_start(){
     curr_task = &task_table.tasks[task_table.curr];
 
     // Set psp to first task stack top
     asm volatile("msr psp, %0\n\t"
-                 :
-                 : "r" (curr_task->sp+64));
+            :
+            : "r" (curr_task->sp+64));
 
     // Thread mode unprivileged with SP_process as current stack
     asm volatile("mov r0, #0x3\n\t"
-                 "msr control, r0");
+            "msr control, r0");
 
     asm volatile("ISB");
 
@@ -59,21 +77,24 @@ void SysTick_Handler(void){
     curr_task = &task_table.tasks[task_table.curr];
     curr_task->status = TASK_STATUS_IDLE;
 
-    task_table.curr++;
-    if(task_table.curr >= task_table.size){
-        task_table.curr = 0;
-    }
+    // Skip over disabled tasks
+    do{
+        task_table.curr++;
+        if(task_table.curr >= task_table.size){
+            task_table.curr = 0;
+        }
+        next_task = &task_table.tasks[task_table.curr];
+    }while(next_task->status == TASK_STATUS_DISABLED);
 
-    next_task = &task_table.tasks[task_table.curr];
     next_task->status = TASK_STATUS_ACTIVE;
 
     //ICSR 0xE000ED04
     //Sets PendSV to pending
     asm volatile("ldr r0, =0xE000ED04\t\n"
-                 "ldr r1, [r0]\t\n"
-                 "orr r1, %0\t\n"
-                 "str r1, [r0]\t\n"
-                 :
-                 : "i" (1UL << 28));
+            "ldr r1, [r0]\t\n"
+            "orr r1, %0\t\n"
+            "str r1, [r0]\t\n"
+            :
+            : "i" (1UL << 28));
 
 }
