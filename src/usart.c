@@ -35,7 +35,7 @@ void uart_send(uint8_t data){
 }
 
 uint8_t uart_read(){
-    while(!(USART2->ISR & USART_ISR_RXNE)) spin1(1);
+    while(!(USART2->ISR & USART_ISR_RXNE)) spin(1);
     return (uint8_t)USART2->RDR;
 }
 
