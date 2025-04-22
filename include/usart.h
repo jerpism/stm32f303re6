@@ -74,5 +74,7 @@ struct usart{
 void uart_init(uint32_t baud);
 void uart_send(uint8_t data);
 void uart_sendstr(const char *s);
+uint8_t uart_read(void);
+
 
 #endif /* USART_H_ */
