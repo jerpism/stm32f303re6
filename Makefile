@@ -3,7 +3,8 @@ ASM_SOURCES = $(wildcard src/*.s)
 HEADERS = $(wildcard *.h)
 OBJ = ${C_SOURCES:.c=.o} ${ASM_SOURCES:.s=.o}
 
-CCFLAGS = -nostdlib -mcpu=cortex-m4 -Og -ggdb \
+CCFLAGS = -mcpu=cortex-m4 -Og -ggdb \
+          -ffreestanding -nostdlib -nostdinc -nodefaultlibs \
 	  -Wall -Wextra \
 	  -I include/
 
@@ -26,3 +27,4 @@ os.elf : ${OBJ}
 
 clean:
 	rm -rf *.bin *.o *.elf
+	rm -rf src/*.o
