@@ -5,7 +5,7 @@
 .type PendSV_Handler,%function
 
 PendSV_Handler:
-    cpsid i 
+    cpsid if 
 
     /* Save r4-r11 for current process */
     mrs     r0, psp
@@ -32,7 +32,7 @@ PendSV_Handler:
     /* Return to thread mode with PSP */
     ldr     r0, =0xFFFFFFFD
 
-    cpsie i
+    cpsie if
 
     bx  r0
 
