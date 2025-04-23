@@ -5,17 +5,10 @@
 #include <systick.h>
 #include <task.h>
 #include <nvic.h>
-
 #include <usart.h>
-
-
-static inline void disable_irq(){
-    asm volatile("cpsid if");
-}
-
-static inline void enable_irq(){
-    asm volatile("cpsie if");
-}
+#include <shell.h>
+#include <libc.h>
+#include <alloc.h>
 
 void task1_handler(){
     while(1){
@@ -24,16 +17,9 @@ void task1_handler(){
     }
 }
 
-void task2_handler(){
-    while(1){
-        uart_sendstr("Let's all love Lain!\n");
-    }
-}
-
 void main(void){
     static uint32_t stack1[128];
     static uint32_t stack2[128];
-
     // PendSV to lowest priority
     // SysTick to highest priority
     nvic_set_priority(NVIC_PENDSV, 0xff);
@@ -45,10 +31,15 @@ void main(void){
     init_led();
     systick_init(8000000 / 100);
 
-    task_init(&task1_handler, stack1, sizeof(stack1));
-    task_init(&task2_handler, stack2, sizeof(stack2));
+    struct task_node *tasks = malloc(sizeof(struct task_node));
+    struct task *t1 = create_task(&task1_handler, stack1, sizeof(stack1));
+    struct task *shellt = create_task(&shell, stack2, sizeof(stack2));
 
-    sched_start();
+    sched_add(tasks, shellt);
+    sched_add(tasks, t1);
+
+    sched_start(tasks);
+
 
     for(;;);
 
