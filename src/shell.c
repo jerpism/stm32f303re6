@@ -25,8 +25,10 @@ void memmove_hack(void *dst, void *src, size_t n){
     }
 }
 
-int strcmp_hack(uint8_t *s1, uint8_t *s2){
-    uint8_t c1, c2;
+int strcmp_hack(const char *str1, const char *str2){
+    char *s1 = str1;
+    char *s2 = str2;
+    char c1, c2;
     do{
         c1 = *s1++;
         c2 = *s2++;
@@ -36,6 +38,7 @@ int strcmp_hack(uint8_t *s1, uint8_t *s2){
 
     return c1 - c2;
 }
+
 
 size_t shell_readinput(uint8_t *buff, size_t size){
     /* Reads into buffer and echos back input */
@@ -68,9 +71,7 @@ void parse_cmd(uint8_t *cmd, size_t n){
     }
 
     if(strcmp_hack(cmd, "blink") == 0){
-        task_enable(0);
     }else if(strcmp_hack(cmd, "blinkoff") == 0){
-        task_disable(0);
     }else if(strcmp_hack(cmd, "ledon") == 0){
         led_on();
     }else if(strcmp_hack(cmd, "ledoff") == 0){
