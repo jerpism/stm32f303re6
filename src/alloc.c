@@ -1,6 +1,7 @@
 #include <stdint.h>
 /* Heap size in words */
 #define HEAPSIZE 4096 
+#define NULL (void*)0
 
 /* Crude allocator just to have dynamic allocation available 
  * shouldn't really be used for anything */
@@ -23,4 +24,9 @@ static inline void *sbrk(size_t n){
 
 void *malloc(size_t n){
     return sbrk(n);
+}
+
+// can't really free anything to just set it to a null pointer
+void free(void *p){
+    p = NULL;
 }
