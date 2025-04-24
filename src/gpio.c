@@ -25,6 +25,8 @@ void test_usart_set_pins(){
     gpio_set_af(GPIO(0), 3, GPIO_AF7);
 }
 
+
+
 void led_on(){
     GPIO(0)->ODR |= BIT(5);
 }
@@ -41,6 +43,10 @@ void init_led(){
     gpio_set_mode(GPIO(0), 5, GPIO_MODE_OUTPUT);
 }
 
-
-
+void blink(){
+    while(1){
+        spin(999999);
+        toggle_led();
+    }
+}
 
