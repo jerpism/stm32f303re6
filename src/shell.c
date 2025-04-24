@@ -93,6 +93,12 @@ void parse_cmd(uint8_t *cmd, size_t n){
 
     if(strcmp_hack(cmd, "test") == 0){
         test();
+    }else if(strcmp_hack(cmd, "ps") == 0){
+        ps();
+    }else if(strcmp_hack(cmd, "spawn") == 0){
+        spawn();
+    }else if(strcmp_hack(cmd, "kill") == 0){
+        kill(1);
     }else if(strcmp_hack(cmd, "ledon") == 0){
         led_on();
     }else if(strcmp_hack(cmd, "ledoff") == 0){
