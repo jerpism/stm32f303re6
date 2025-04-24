@@ -10,13 +10,6 @@
 #include <libc.h>
 #include <alloc.h>
 
-void task1_handler(){
-    while(1){
-        spin(999999);
-        toggle_led();
-    }
-}
-
 void main(void){
     static uint32_t stack1[128];
     static uint32_t stack2[128];
@@ -31,14 +24,14 @@ void main(void){
     init_led();
     systick_init(8000000 / 100);
 
-    struct task *t1 = create_task(&task1_handler, stack1, sizeof(stack1));
-    struct task *shellt = create_task(&shell, stack2, sizeof(stack2));
+    struct task *shellt = create_task(&shell, stack2, sizeof(stack2), "shell");
+    //struct task *blinky = create_task(&blink, stack1, sizeof(stack1), "blinky");
 
-    sched_add(t1);
     sched_add(shellt);
+    //sched_add(blinky);
 
+    // Jump into the scheduler, hopefully to never return
     sched_start();
-
 
     for(;;);
 
