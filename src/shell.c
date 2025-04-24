@@ -62,6 +62,27 @@ size_t shell_readinput(uint8_t *buff, size_t size){
     return size;
 }
 
+void test(){
+    for(int i = 0; i < 31; ++i){
+        uart_send('=');
+    }
+    uart_sendstr("\n\r");
+
+    uart_sendstr("TTTTTT  EEEEEE   SSSSSS  TTTTTT\r\n");
+    uart_sendstr("  TT    EE       SS        TT  \r\n");
+    uart_sendstr("  TT    EE       SS        TT  \r\n");
+    uart_sendstr("  TT    EEEE     SSSSSS    TT  \r\n");
+    uart_sendstr("  TT    EE           SS    TT  \r\n");
+    uart_sendstr("  TT    EE           SS    TT  \r\n");
+    uart_sendstr("  TT    EEEEEE   SSSSSS    TT  \r\n");
+
+    for(int i = 0; i < 31; ++i){
+        uart_send('=');
+    }
+
+    uart_sendstr("\n\r");
+}
+
 
 void parse_cmd(uint8_t *cmd, size_t n){
     for(size_t i = 0; i < n; ++i){
@@ -70,8 +91,8 @@ void parse_cmd(uint8_t *cmd, size_t n){
         }
     }
 
-    if(strcmp_hack(cmd, "blink") == 0){
-    }else if(strcmp_hack(cmd, "blinkoff") == 0){
+    if(strcmp_hack(cmd, "test") == 0){
+        test();
     }else if(strcmp_hack(cmd, "ledon") == 0){
         led_on();
     }else if(strcmp_hack(cmd, "ledoff") == 0){
