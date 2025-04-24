@@ -25,9 +25,8 @@ struct task_node{
 };
 
 
-void sched_start(struct task_node *head);
-struct task_node *sched_add(struct task_node *last, struct task *task);
-
+void sched_start();
+void sched_add(struct task *task);
 struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_size);
 
 

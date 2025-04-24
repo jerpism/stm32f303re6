@@ -5,11 +5,15 @@
 #include <usart.h>
 #include <libc.h>
 
-
 static volatile uint32_t nextpid = 0;
 
+/* These are accessed in PendSV_Handler 
+ * swtch will go from curr_task -> next_task */
 volatile struct task *curr_task;
 volatile struct task *next_task;
+
+static volatile struct task_node *head = NULL;
+static volatile struct task_node *last = NULL;
 static volatile struct task_node *current = NULL;
 
 static void task_finished(void){
@@ -30,28 +34,26 @@ struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_si
     return new;
 }
 
-struct task_node *new_queue(struct task_node *last, struct task *task){
-
-}
-
-struct task_node *sched_add(struct task_node *last, struct task *task){
+void sched_add(struct task *task){
     disable_irq();
-    if(last == NULL) return 0;
 
     struct task_node *new = malloc(sizeof(struct task_node));
+
+    if(head == NULL){
+        head = new;
+        last = head;
+    }
+
     new->task = task;
+
     new->next = last;
-
     last->next = new;
-
-    return last;
 
     enable_irq();
 }
 
-void sched_start(struct task_node *head){
-    // Head just points to first task and doesn't actually contain a task itself  
-    current = head->next;
+void sched_start(){
+    current = head;
     curr_task = current->task;
 
     // Set psp to first task stack top

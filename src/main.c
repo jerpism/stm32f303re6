@@ -31,14 +31,13 @@ void main(void){
     init_led();
     systick_init(8000000 / 100);
 
-    struct task_node *tasks = malloc(sizeof(struct task_node));
     struct task *t1 = create_task(&task1_handler, stack1, sizeof(stack1));
     struct task *shellt = create_task(&shell, stack2, sizeof(stack2));
 
-    sched_add(tasks, shellt);
-    sched_add(tasks, t1);
+    sched_add(t1);
+    sched_add(shellt);
 
-    sched_start(tasks);
+    sched_start();
 
 
     for(;;);
