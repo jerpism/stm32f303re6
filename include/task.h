@@ -17,6 +17,7 @@ struct task{
     void (*handler)(void);
     volatile enum task_status status;
     uint32_t pid;
+    const char *name;
 };
 
 struct task_node{
@@ -27,7 +28,11 @@ struct task_node{
 
 void sched_start();
 void sched_add(struct task *task);
-struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_size);
+
+void ps();
+void kill(uint32_t pid);
+void spawn();
+struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_size, const char *name);
 
 
 #endif /* TASK_H_ */

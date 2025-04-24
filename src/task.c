@@ -4,6 +4,7 @@
 #include <common.h>
 #include <usart.h>
 #include <libc.h>
+#include <gpio.h>
 
 static volatile uint32_t nextpid = 0;
 
@@ -12,20 +13,22 @@ static volatile uint32_t nextpid = 0;
 volatile struct task *curr_task;
 volatile struct task *next_task;
 
-static volatile struct task_node *head = NULL;
-static volatile struct task_node *last = NULL;
+static struct task_node *head = NULL;
+static struct task_node *last = NULL;
 static volatile struct task_node *current = NULL;
 
 static void task_finished(void){
     while(1);
 }
 
-struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_size){
+
+struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_size, const char *name){
     struct task *new = malloc(sizeof(struct task));
 
     new->handler = handler;
     new->sp = (uint32_t)(stack+stack_size-16);
     new->pid = nextpid++;
+    new->name = name;
 
     stack[stack_size-1] = 0x01000000;
     stack[stack_size-2] = (uint32_t)handler;
@@ -50,6 +53,62 @@ void sched_add(struct task *task){
     last->next = new;
 
     enable_irq();
+}
+
+void sched_remove(uint32_t pid){
+    disable_irq();
+    if(head == NULL){ goto end;}
+
+    struct task_node **pn = &head;
+    struct task_node *n = head;
+
+    do{
+        if(n->task->pid == pid){
+            *pn = n->next;
+            free(n->task);
+            free(n);
+            break;
+        }
+        pn = &n->next;
+        n = n->next;
+    }while(n != NULL && n != head);
+
+end:
+    enable_irq();
+    return;
+}
+
+void ps(){
+    if(head == NULL) return;
+
+    struct task_node *tmp = head;
+    char c[3];
+    uart_sendstr("pid\tname\n\n\r");
+
+    do{
+        if(tmp->task == NULL) break;
+        itoa(tmp->task->pid, c, 10);
+        uart_sendstr(c);
+        uart_send('\t');
+        uart_sendstr(tmp->task->name);
+        uart_sendstr("\r\n");
+
+        tmp = tmp->next;
+    }while (tmp != head);
+}
+
+void kill(uint32_t pid){
+    //I don't feel like parsing any input so just kill 1-10 every time, one of them will be a blinky hopefully
+    //0 should always be shell so don't kill that
+    for(int i = 1; i <= 10; ++i){
+        sched_remove(i);
+    }
+}
+
+void spawn(){
+    uint32_t *pstack = malloc(64);
+    struct task *blinky = create_task(&blink, pstack, 64, "blinky");
+    sched_add(blinky);
 }
 
 void sched_start(){
