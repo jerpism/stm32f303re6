@@ -16,19 +16,16 @@ void main(void){
     // PendSV to lowest priority
     // SysTick to highest priority
     nvic_set_priority(NVIC_PENDSV, 0xff);
-    nvic_set_priority(NVIC_SYSTICK, 0x00);
+    nvic_set_priority(NVIC_SYSTICK, 0x04);
+    nvic_set_priority(NVIC_SVCALL, 0x00);
 
     uart_init(9600);
-
-    
-    init_led();
     systick_init(8000000 / 100);
+    init_led();
 
     struct task *shellt = create_task(&shell, stack2, sizeof(stack2), "shell");
-    //struct task *blinky = create_task(&blink, stack1, sizeof(stack1), "blinky");
 
     sched_add(shellt);
-    //sched_add(blinky);
 
     // Jump into the scheduler, hopefully to never return
     sched_start();
@@ -49,8 +46,12 @@ __attribute__((naked, noreturn)) void _reset(void) {
 extern void _estack(void);  
 extern void PendSV_Handler(void);
 extern void SysTick_Handler(void);
+extern void SVCall_Handler(void);
 
+void HardFault_Handler(void){
+    while(1);
+}
 
 __attribute__((section(".vectors"))) void (*const tab[16 + 84])(void) = {
-    _estack, _reset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, PendSV_Handler, SysTick_Handler
+    _estack, _reset, 0, HardFault_Handler, 0, 0, 0, 0, 0, 0, 0, SVCall_Handler, 0, 0, PendSV_Handler, SysTick_Handler
 };
