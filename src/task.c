@@ -23,6 +23,7 @@ static void task_finished(void){
 
 
 struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_size, const char *name){
+
     struct task *new = malloc(sizeof(struct task));
 
     new->handler = handler;
@@ -47,36 +48,48 @@ void sched_add(struct task *task){
         last = head;
     }
 
-    new->task = task;
 
+    new->task = task;
     new->next = last->next;
     last->next = new;
-     
     last = new;
 
     enable_irq();
+
 }
 
 void sched_remove(uint32_t pid){
-    disable_irq();
-    if(head == NULL){ goto end;}
+    // If this was somehow called before we had any scheduler queue just return
+    if(head == NULL){ return; }
+    // Can't kill that which was never alive
+    // and also don't kill pid 0, that's probably something important
+    if(pid > nextpid || pid == 0){ return; }
 
-    struct task_node **pn = &head;
-    struct task_node *n = head;
+    disable_irq();
+
+    struct task_node *curr = head;
+    struct task_node *prev = head;
 
     do{
-        if(n->task->pid == pid){
-            *pn = n->next;
-            free(n->task);
-            free(n);
+        if(curr->task->pid == pid){
+
+            if(curr->next == head){
+                last = prev;
+                last->next = curr->next;
+            }
+
+            prev->next = curr->next;
+
+            free(curr->task);
+            free(curr);
             break;
         }
-        pn = &n->next;
-        n = n->next;
-    }while(n != NULL && n != head);
+        prev = curr;
+        curr = curr->next;
+    }while(curr != head && curr != NULL);
 
-end:
     enable_irq();
+
     return;
 }
 
@@ -101,7 +114,7 @@ void ps(){
 
 void kill(uint32_t pid){
     //I don't feel like parsing any input so just kill 1-20 every time, one of them will be a blinky hopefully
-    //0 should always be shell so don't kill that
+    //0 should always be shell so don't kill that (not that you can anyways)
     for(int i = 1; i <= 10; ++i){
         sched_remove(i);
     }
@@ -121,8 +134,11 @@ void blinkr(){
 }
 
 void sched_start(){
+    disable_irq();
+
     current = head;
     curr_task = current->task;
+
 
     // Set psp to first task stack top
     asm volatile("msr psp, %0\n\t"
@@ -135,6 +151,8 @@ void sched_start(){
             "msr control, r0");
 
     asm volatile("ISB");
+
+    enable_irq();
 
 
     curr_task->handler();

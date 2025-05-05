@@ -10,11 +10,13 @@ static inline void spin(volatile uint32_t c){
 }
 
 static inline void disable_irq(){
-    asm volatile("cpsid if");
+/*    asm volatile("mov r0, #0\n\t"
+                 "svc 0");*/
 }
 
 static inline void enable_irq(){
-    asm volatile("cpsie if");
+/*    asm volatile("mov r0, #1\n\t"
+                 "svc 0");*/
 }
 
 #endif /* COMMON_H_ */
