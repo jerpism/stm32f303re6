@@ -76,9 +76,9 @@ void sched_remove(uint32_t pid){
             if(curr->next == head){
                 last = prev;
                 last->next = curr->next;
+            }else{
+                prev->next = curr->next;
             }
-
-            prev->next = curr->next;
 
             free(curr->task);
             free(curr);
