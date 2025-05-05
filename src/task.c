@@ -127,7 +127,7 @@ void sched_start(){
     // Set psp to first task stack top
     asm volatile("msr psp, %0\n\t"
             :
-            : "r" (current->task->sp+64));
+            : "r" (curr_task->sp+64));
 
 
     // Thread mode unprivileged with SP_process as current stack
