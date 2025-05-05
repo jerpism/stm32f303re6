@@ -49,8 +49,10 @@ void sched_add(struct task *task){
 
     new->task = task;
 
-    new->next = last;
+    new->next = last->next;
     last->next = new;
+     
+    last = new;
 
     enable_irq();
 }
@@ -98,16 +100,23 @@ void ps(){
 }
 
 void kill(uint32_t pid){
-    //I don't feel like parsing any input so just kill 1-10 every time, one of them will be a blinky hopefully
+    //I don't feel like parsing any input so just kill 1-20 every time, one of them will be a blinky hopefully
     //0 should always be shell so don't kill that
     for(int i = 1; i <= 10; ++i){
         sched_remove(i);
     }
 }
 
-void spawn(){
+void blinkg(){
     uint32_t *pstack = malloc(64);
-    struct task *blinky = create_task(&blink, pstack, 64, "blinky");
+    struct task *blinky = create_task(&blink, pstack, 64, "blinkg");
+    sched_add(blinky);
+}
+
+
+void blinkr(){
+    uint32_t *pstack = malloc(64);
+    struct task *blinky = create_task(&blink_red, pstack, 64, "blinkr");
     sched_add(blinky);
 }
 

@@ -31,7 +31,9 @@ void sched_add(struct task *task);
 
 void ps();
 void kill(uint32_t pid);
-void spawn();
+void blinkg();
+void blinkr();
+
 struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_size, const char *name);
 
 
