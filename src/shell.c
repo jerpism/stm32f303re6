@@ -68,13 +68,13 @@ void test(){
     }
     uart_sendstr("\n\r");
 
-    uart_sendstr("TTTTTT  EEEEEE   SSSSSS  TTTTTT\r\n");
-    uart_sendstr("  TT    EE       SS        TT  \r\n");
-    uart_sendstr("  TT    EE       SS        TT  \r\n");
-    uart_sendstr("  TT    EEEE     SSSSSS    TT  \r\n");
-    uart_sendstr("  TT    EE           SS    TT  \r\n");
-    uart_sendstr("  TT    EE           SS    TT  \r\n");
-    uart_sendstr("  TT    EEEEEE   SSSSSS    TT  \r\n");
+    uart_sendstr("TTTTTT  EEEEEE  SSSSSS  TTTTTT\r\n");
+    uart_sendstr("  TT    EE      SS        TT  \r\n");
+    uart_sendstr("  TT    EE      SS        TT  \r\n");
+    uart_sendstr("  TT    EEEE    SSSSSS    TT  \r\n");
+    uart_sendstr("  TT    EE          SS    TT  \r\n");
+    uart_sendstr("  TT    EE          SS    TT  \r\n");
+    uart_sendstr("  TT    EEEEEE  SSSSSS    TT  \r\n");
 
     for(int i = 0; i < 31; ++i){
         uart_send('=');
@@ -95,8 +95,10 @@ void parse_cmd(uint8_t *cmd, size_t n){
         test();
     }else if(strcmp_hack(cmd, "ps") == 0){
         ps();
-    }else if(strcmp_hack(cmd, "spawn") == 0){
-        spawn();
+    }else if(strcmp_hack(cmd, "blinkg") == 0){
+        blinkg();
+    }else if(strcmp_hack(cmd, "blinkr") == 0){
+        blinkr();
     }else if(strcmp_hack(cmd, "kill") == 0){
         kill(1);
     }else if(strcmp_hack(cmd, "ledon") == 0){

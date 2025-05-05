@@ -54,6 +54,7 @@ void led_off();
 void init_led();
 void toggle_led();
 void blink();
+void blink_red();
 
 
 #endif /* GPIO_H_ */
