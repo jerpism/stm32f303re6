@@ -5,6 +5,7 @@
 
 #define NVIC_IMPLEMENTED 100
 
+#define NVIC_SVCALL     11
 #define NVIC_PENDSV     14
 #define NVIC_SYSTICK    15
 
