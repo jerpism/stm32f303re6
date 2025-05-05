@@ -39,6 +39,10 @@ void toggle_led(){
     GPIO(0)->ODR ^= BIT(5);
 }
 
+void toggle_red(){
+    GPIO(0)->ODR ^= BIT(1);
+}
+
 void init_led(){
     gpio_set_mode(GPIO(0), 5, GPIO_MODE_OUTPUT);
     gpio_set_mode(GPIO(0), 1, GPIO_MODE_OUTPUT);
@@ -54,7 +58,7 @@ void blink(){
 void blink_red(){
     while(1){
         spin(999999);
-        GPIO(0)->ODR ^= BIT(1);
+        toggle_red();
     }
 }
 
