@@ -126,15 +126,15 @@ void kill(uint32_t pid){
 }
 
 void blinkg(){
-    uint32_t *pstack = malloc(64);
-    struct task *blinky = create_task(&blink, pstack, 64, "blinkg");
+    uint32_t *pstack = malloc(sizeof(uint32_t) * 32);
+    struct task *blinky = create_task(&blink, pstack, sizeof(uint32_t) * 32, "blinkg");
     sched_add(blinky);
 }
 
 
 void blinkr(){
-    uint32_t *pstack = malloc(64);
-    struct task *blinky = create_task(&blink_red, pstack, 64, "blinkr");
+    uint32_t *pstack = malloc(sizeof(uint32_t) * 32);
+    struct task *blinky = create_task(&blink_red, pstack, sizeof(uint32_t) * 32, "blinkr");
     sched_add(blinky);
 }
 
