@@ -3,7 +3,6 @@
 #include <stdint.h>
 
 #define MAX_TASKS 16
-#define NULL (void*)0
 
 enum task_status {
     TASK_STATUS_DISABLED = -2,
