@@ -8,7 +8,6 @@
 #include <usart.h>
 #include <shell.h>
 #include <libc.h>
-#include <alloc.h>
 
 void main(void){
     static uint32_t stack1[128];

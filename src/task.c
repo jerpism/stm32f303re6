@@ -1,10 +1,16 @@
 #include <task.h>
-#include <alloc.h>
 #include <systick.h>
 #include <common.h>
 #include <usart.h>
 #include <libc.h>
 #include <gpio.h>
+#include <linkedListAllocator.h>
+
+#define FREE_TASK(x)    free(x->task);  \
+                        x->task = NULL; \
+                        free(x);        \
+                        x = NULL;       \
+
 
 static volatile uint32_t nextpid = 0;
 
@@ -80,8 +86,7 @@ void sched_remove(uint32_t pid){
                 prev->next = curr->next;
             }
 
-            free(curr->task);
-            free(curr);
+            FREE_TASK(curr);
             break;
         }
         prev = curr;
