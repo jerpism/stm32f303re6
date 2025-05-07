@@ -28,7 +28,11 @@ SECTIONS {
   _end = .;     /* for cmsis_gcc.h  */
 
   .heap : {
+      . = ALIGN(4); 
+      _heap_start = .;
+      /* . = + (LENGTH(SRAM) - _stackSize - (. - ORIGIN(SRAM))); */
+      . = . + 16K;
       . = ALIGN(4);
-      *(.heap*)
-  } >sram
+      _heap_end  = .; 
+ } >SRAM
 }
