@@ -2,7 +2,8 @@
 #define LINEARALLOCATOR_H
 #include <stdlib.h>
 #include <stdbool.h>
-#include <inttypes.h>
+#include <stdint.h>
+//#include <inttypes.h>
 
 typedef struct heapBlock{ // header for the memory blocks
   size_t size;
