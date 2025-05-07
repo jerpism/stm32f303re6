@@ -1,88 +1,69 @@
+#include <stdint.h>
+#include <common.h>
 #include <rcc.h>
 #include <gpio.h>
-#include <stdint.h>
+#include <usart.h>
+#include <dma.h>
 
-#include <usart_mr.h>
+#define FREQ 8000000
 
-#define USART_BAUDRATE 9600
-#define APB2_CLOCK 8000000
+void uart_init(uint32_t baud) {
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_DMA1EN;
+    RCC->CFGR3 |= RCC_CFGR3_USART2SW_HSI;
 
-#define RX_BUFFER_SIZE 64
-volatile char rx_buffer[RX_BUFFER_SIZE];
-volatile uint8_t rx_head = 0;
-volatile uint8_t rx_tail = 0;
+    GPIO(0)->MODER |= (2 << (2 * 2)) | (2 << (3 * 2));
+    GPIO(0)->AFR[0] |= (7 << (2 * 4)) | (7 << (3 * 4));
 
-void USART1_Init(void) {
-    // Otetaan GPIOA käyttöön (USART1 TX: PA9, RX: PA10)
-    RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
-    GPIO(0)->MODER |= (2 << (9 * 2)) | (2 << (10 * 2)); // PA9 & PA10 AF-moodiin
-    GPIO(0)->AFR[1] |= (7 << (1 * 4)) | (7 << (2 * 4)); // AF7 (USART1)
+    RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
 
-    // Otetaan USART1 käyttöön
-    RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-    
-    // Asetetaan baudinopeus
-    USART1->BRR = APB2_CLOCK / USART_BAUDRATE;
-    
-    // Otetaan vastaanotto, lähetys ja vastaanottokeskeytys käyttöön
-    USART1->CR1 = USART_CR1_RE | USART_CR1_TE | USART_CR1_RXNEIE | USART_CR1_UE;
-
-/*   JM: pitää vielä implementoida tämä
- *
-    // Otetaan käyttöön NVIC-keskeytys
-    NVIC_EnableIRQ(USART1_IRQn);
-
-*/
+    USART2->CR1 = 0;
+    USART2->BRR = FREQ / baud;
+    USART2->CR3 |= USART_CR3_DMAT;
+    USART2->CR1 |= USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
 }
 
-void USART1_SendChar(char c) {
-    while (!(USART1->ISR & USART_ISR_TXE));
-    USART1->TDR = c;
+void uart_send(uint8_t data) {
+    while (!(USART2->ISR & USART_ISR_TXE)) spin(1);
+    USART2->TDR = data;
 }
 
-void USART1_SendString(const char *str) {
-    while (*str) {
-        USART1_SendChar(*str++);
+void uart_sendstr(const char *s) {
+    while (*s) {
+        uart_send(*s++);
     }
 }
 
-char USART1_ReadChar(void) {
-    if (rx_head == rx_tail) return 0;
-    char c = rx_buffer[rx_tail];
-    rx_tail = (rx_tail + 1) % RX_BUFFER_SIZE;
-    return c;
+void uart_receive(uint8_t *buffer, uint32_t len) {
+    DMA1_Channel6->CCR = 0;
+    DMA1_Channel6->CPAR = (uint32_t)&USART2->RDR;
+    DMA1_Channel6->CMAR = (uint32_t)buffer;
+    DMA1_Channel6->CNDTR = len;
+
+    DMA1_Channel6->CCR =
+        DMA_CCR_MINC |
+        DMA_CCR_DIR  |
+        DMA_CCR_EN;
+
+    while (!(DMA1->ISR & DMA_ISR_TCIF6));
+    DMA1->IFCR |= DMA_IFCR_CTCIF6;
 }
 
-/*void USART1_IRQHandler(void) {
-    if (USART1->ISR & USART_ISR_RXNE) {
-        char c = USART1->RDR;
-        uint8_t next_head = (rx_head + 1) % RX_BUFFER_SIZE;
-        if (next_head != rx_tail) {
-            rx_buffer[rx_head] = c;
-            rx_head = next_head;
-        }
-    }
-}*/
+void uart_sendstr_dma(const char *s) {
+    uint32_t len = 0;
+    while (s[len]) len++;
 
-/*int main(void) {
-    USART1_Init(); // Alustetaan USART1
-    USART1_SendString("Kirjoita jotain: \n");
-    
-    char input_buffer[RX_BUFFER_SIZE];
-    uint8_t index = 0;
-    
-    while (1) {
-        char c = USART1_ReadChar();
-        if (c) { 
-            if (c == '\n' || c == '\r') {
-                input_buffer[index] = '\0';
-                USART1_SendString("Kirjoitit: ");
-                USART1_SendString(input_buffer);
-                USART1_SendString("\n");
-                index = 0; //
-            } else if (index < RX_BUFFER_SIZE - 1) {
-                input_buffer[index++] = c;
-            }
-        }
-    }
-}*/
+    DMA1_Channel7->CCR = 0;
+
+    DMA1_Channel7->CPAR = (uint32_t)&USART2->TDR;
+    DMA1_Channel7->CMAR = (uint32_t)s;
+    DMA1_Channel7->CNDTR = len;
+
+    DMA1_Channel7->CCR =
+        DMA_CCR_MINC |
+        DMA_CCR_DIR  |
+        DMA_CCR_TCIE |
+        DMA_CCR_EN;
+
+    while (!(DMA1->ISR & DMA_ISR_TCIF7));
+    DMA1->IFCR |= DMA_IFCR_CTCIF7;
+}
