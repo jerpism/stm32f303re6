@@ -11,7 +11,7 @@ typedef struct {
     volatile uint32_t CNDTR;
     volatile uint32_t CPAR;
     volatile uint32_t CMAR;
-    volatile uint32_t RESERVED[2];
+    volatile uint32_t RESERVED;
 } DMA_Channel_TypeDef;
 
 typedef struct {
@@ -20,17 +20,15 @@ typedef struct {
     DMA_Channel_TypeDef CHANNEL[7];
 } DMA_TypeDef;
 
-#define DMA_ISR_TCIF6 (1 << 20)
-#define DMA_ISR_TCIF7 (1 << 22)
+#define DMA_ISR_TCIF6   (1 << 21)
+#define DMA_ISR_TCIF7   (1 << 25)
 
-#define DMA_IFCR_CTCIF6 (1 << 20)
-#define DMA_IFCR_CTCIF7 (1 << 22)
+#define DMA_IFCR_CTCIF6 (1 << 21)
+#define DMA_IFCR_CTCIF7 (1 << 25)
 
-#define DMA_CCR_MINC  (1 << 7)
-#define DMA_CCR_DIR    (1 << 4)
-#define DMA_CCR_TCIE   (1 << 1)
-#define DMA_CCR_EN     (1 << 0)
-
-#define RCC_AHBENR_DMA1EN (1 << 21)
+#define DMA_CCR_EN      (1 << 0)
+#define DMA_CCR_TCIE    (1 << 1)
+#define DMA_CCR_DIR     (1 << 4)
+#define DMA_CCR_MINC    (1 << 7)
 
 #endif

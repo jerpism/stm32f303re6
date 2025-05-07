@@ -34,12 +34,12 @@ void uart_sendstr(const char *s) {
 }
 
 void uart_receive(uint8_t *buffer, uint32_t len) {
-    DMA1_Channel6->CCR = 0;
-    DMA1_Channel6->CPAR = (uint32_t)&USART2->RDR;
-    DMA1_Channel6->CMAR = (uint32_t)buffer;
-    DMA1_Channel6->CNDTR = len;
+    DMA1->CHANNEL[6].CCR = 0;
+    DMA1->CHANNEL[6].CPAR = (uint32_t)&USART2->RDR;
+    DMA1->CHANNEL[6].CMAR = (uint32_t)buffer;
+    DMA1->CHANNEL[6].CNDTR = len;
 
-    DMA1_Channel6->CCR =
+    DMA1->CHANNEL[6].CCR =
         DMA_CCR_MINC |
         DMA_CCR_DIR  |
         DMA_CCR_EN;
@@ -52,18 +52,17 @@ void uart_sendstr_dma(const char *s) {
     uint32_t len = 0;
     while (s[len]) len++;
 
-    DMA1_Channel7->CCR = 0;
+    DMA1->CHANNEL[7].CCR = 0;
 
-    DMA1_Channel7->CPAR = (uint32_t)&USART2->TDR;
-    DMA1_Channel7->CMAR = (uint32_t)s;
-    DMA1_Channel7->CNDTR = len;
+    DMA1->CHANNEL[7].CPAR = (uint32_t)&USART2->TDR;
+    DMA1->CHANNEL[7].CMAR = (uint32_t)s;
+    DMA1->CHANNEL[7].CNDTR = len;
 
-    DMA1_Channel7->CCR =
+    DMA1->CHANNEL[7].CCR =
         DMA_CCR_MINC |
         DMA_CCR_DIR  |
         DMA_CCR_TCIE |
         DMA_CCR_EN;
-
     while (!(DMA1->ISR & DMA_ISR_TCIF7));
     DMA1->IFCR |= DMA_IFCR_CTCIF7;
 }
