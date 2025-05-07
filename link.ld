@@ -34,5 +34,5 @@ SECTIONS {
       . = . + 16K;
       . = ALIGN(4);
       _heap_end  = .; 
- } >SRAM
+ } > sram
 }
