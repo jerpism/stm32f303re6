@@ -13,19 +13,18 @@
 
 
 void main(void){
-    static uint32_t stack1[128];
-    static uint32_t stack2[128];
     // PendSV to lowest priority
     // SysTick to highest priority
     nvic_set_priority(NVIC_PENDSV, 0xff);
+    nvic_set_priority(NVIC_SVCALL, 0xff);
     nvic_set_priority(NVIC_SYSTICK, 0x04);
-    nvic_set_priority(NVIC_SVCALL, 0x00);
 
     uart_init(9600);
     systick_init(8000000 / 100);
     init_led();
 
-    struct task *shellt = create_task(&shell, stack2, sizeof(stack2), "shell");
+    uint32_t *pstack = malloc(sizeof(uint32_t) * 128);
+    struct task *shellt = create_task(&shell, pstack, 128, "shell");
     sched_add(shellt);
 
     // Jump into the scheduler, hopefully to never return
