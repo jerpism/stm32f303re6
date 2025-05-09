@@ -1,10 +1,18 @@
 #include <task.h>
-#include <alloc.h>
 #include <systick.h>
 #include <common.h>
 #include <usart.h>
 #include <libc.h>
 #include <gpio.h>
+
+#include <stdlib.h>
+#include <syscall.h>
+
+#define FREE_TASK(x)    free(x->task);  \
+                        x->task = NULL; \
+                        free(x);        \
+                        x = NULL;       \
+
 
 static volatile uint32_t nextpid = 0;
 
@@ -80,8 +88,7 @@ void sched_remove(uint32_t pid){
                 prev->next = curr->next;
             }
 
-            free(curr->task);
-            free(curr);
+            FREE_TASK(curr);
             break;
         }
         prev = curr;
@@ -121,15 +128,15 @@ void kill(uint32_t pid){
 }
 
 void blinkg(){
-    uint32_t *pstack = malloc(64);
-    struct task *blinky = create_task(&blink, pstack, 64, "blinkg");
+    uint32_t *pstack = malloc(sizeof(uint32_t) * 32);
+    struct task *blinky = create_task(&blink, pstack, sizeof(uint32_t) * 32, "blinkg");
     sched_add(blinky);
 }
 
 
 void blinkr(){
-    uint32_t *pstack = malloc(64);
-    struct task *blinky = create_task(&blink_red, pstack, 64, "blinkr");
+    uint32_t *pstack = malloc(sizeof(uint32_t) * 32);
+    struct task *blinky = create_task(&blink_red, pstack, sizeof(uint32_t) * 32, "blinkr");
     sched_add(blinky);
 }
 
