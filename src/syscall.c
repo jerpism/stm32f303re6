@@ -1,5 +1,6 @@
 #include <syscall.h>
 #include <stdint.h>
+#include <linkedListAllocator.h>
 
 static inline void __disable_irq(){
     asm volatile("cpsid if");
@@ -9,12 +10,16 @@ static inline void __enable_irq(){
 }
 
 
-long syscall0(int n){
-    return n*2;
+void *syscall0(size_t n){
+    return malloc_internal(n);
 }
 
-long syscall1(int n){
-    return n*4;
+void syscall1(void *p){
+    free_internal(p);
+}
+
+long syscall2(long n){
+    return n*2;
 }
 
 
@@ -36,9 +41,17 @@ long syscall(long num, long r0, long r1, long r2, long r3){
 }
 
 
+void *malloc(size_t n){
+    return (void*)syscall(0, n, 0, 0, 0);
+}
 
-long testcall(int n){
-    return syscall(1, n, 0, 0, 0);
+void free(void *p){
+    syscall(1, (long)p, 0, 0, 0);
+}
+
+
+long testcall(long n){
+    return syscall(2, n, 0, 0, 0);
 }
 
 
