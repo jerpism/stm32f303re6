@@ -34,8 +34,12 @@ struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_si
 
     struct task *new = malloc(sizeof(struct task));
 
+    if(new == NULL){
+        fault("Got NULL at create_task:", (uint32_t)stack, stack_size, 0);
+    }
+
     new->handler = handler;
-    new->sp = (uint32_t)(stack+stack_size-16);
+    new->sp = (uint32_t)(stack + stack_size - 16);
     new->pid = nextpid++;
     new->name = name;
 
@@ -49,6 +53,10 @@ struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_si
 
 void sched_add(struct task *task){
     struct task_node *new = malloc(sizeof(struct task_node));
+
+    if(new == NULL){
+        fault("Got NULL at sched_add:", (uint32_t)task, task->sp, 0);
+    }
 
     if(head == NULL){
         head = new;
@@ -117,14 +125,14 @@ void ps(){
 
 void blinkg(){
     uint32_t *pstack = malloc(sizeof(uint32_t) * 32);
-    struct task *blinky = create_task(&blink, pstack, sizeof(uint32_t) * 32, "blinkg");
+    struct task *blinky = create_task(&blink, pstack,  32, "blinkg");
     exec(blinky);
 }
 
 
 void blinkr(){
     uint32_t *pstack = malloc(sizeof(uint32_t) * 32);
-    struct task *blinky = create_task(&blink_red, pstack, sizeof(uint32_t) * 32, "blinkr");
+    struct task *blinky = create_task(&blink_red, pstack, 32, "blinkr");
     exec(blinky);
 }
 

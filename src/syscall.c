@@ -1,6 +1,8 @@
 #include <syscall.h>
 #include <stdint.h>
 #include <linkedListAllocator.h>
+#include <usart.h>
+#include <libc.h>
 
 
 void *syscall0(size_t n){
@@ -17,6 +19,29 @@ void syscall2(struct task *t){
 
 void syscall3(uint32_t pid){
     sched_remove(pid);
+}
+
+void syscall4(const char *s, uint32_t a, uint32_t b, uint32_t c){
+    asm volatile("cpsid if");
+
+    char tmp[12];
+
+    uart_sendstr(s);
+    uart_sendstr("\r\n");
+
+    itoa(a, tmp, 16);
+    uart_sendstr(tmp);
+    uart_sendstr("\r\n");
+    
+    itoa(b, tmp, 16);
+    uart_sendstr(tmp);
+    uart_sendstr("\r\n");
+
+    itoa(c, tmp, 16);
+    uart_sendstr(tmp);
+    uart_sendstr("\r\n");
+
+    while(1);
 }
 
 uint32_t syscall(uint32_t num, uint32_t r0, uint32_t r1, uint32_t r2, uint32_t r3){
@@ -55,4 +80,9 @@ void kill(uint32_t pid){
     
     for(int i = 1; i < 10; ++i)
         sched_remove(i);
+}
+
+
+void fault(const char *s, uint32_t a, uint32_t b, uint32_t c){
+    syscall(4, (uint32_t)s, a, b, c);
 }

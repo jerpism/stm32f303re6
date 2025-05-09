@@ -5,7 +5,7 @@
 .global SVCall_Handler
 .type SVCall_Handler,%function
 
-.equ N_SYSCALL, 4
+.equ N_SYSCALL, 5
 
 SVCall_Handler:
     /* See if we have a valid syscall # */
@@ -51,6 +51,9 @@ call2:  bl syscall2
 
 call3:  bl syscall3
         b svc_end
+call4:
+        bl syscall4
+        b svc_end
 
 .align 4
 syscall_table:
@@ -58,5 +61,6 @@ syscall_table:
     .word call1
     .word call2
     .word call3
+    .word call4
 .align 4
 table_addr: .word syscall_table
