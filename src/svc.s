@@ -42,15 +42,17 @@ svc_end:
 call0:  bl syscall0
         b svc_end
 
-call1: bl syscall1
+call1:  bl syscall1
+        b svc_end
 
-b svc_end
-
+call2:  bl syscall2
+        b svc_end
 
 
 .align 4
 syscall_table:
     .word call0
     .word call1
+    .word call2
 .align 4
 table_addr: .word syscall_table
