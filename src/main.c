@@ -9,6 +9,9 @@
 #include <shell.h>
 #include <libc.h>
 
+#include <syscall.h>
+
+
 void main(void){
     static uint32_t stack1[128];
     static uint32_t stack2[128];
@@ -23,7 +26,6 @@ void main(void){
     init_led();
 
     struct task *shellt = create_task(&shell, stack2, sizeof(stack2), "shell");
-
     sched_add(shellt);
 
     // Jump into the scheduler, hopefully to never return

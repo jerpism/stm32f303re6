@@ -5,11 +5,9 @@
 .global SVCall_Handler
 .type SVCall_Handler,%function
 
-.equ N_SYSCALL, 3
+.equ N_SYSCALL, 4
 
 SVCall_Handler:
-    cpsid if    // Disable interrupts
-
     /* See if we have a valid syscall # */
     cmp     r7, #0
     blt     .end
@@ -29,6 +27,7 @@ SVCall_Handler:
     ldr     r12, table_addr
     ldr     r12, [r12, +r7, lsl #2] // r7 has syscall #
     bic     r12, #0x1               // clear bit 0 so we don't fault
+
     mov     pc, r12                 // go run syscall
 
 svc_end:
@@ -36,9 +35,11 @@ svc_end:
     stm     r12, {r0}               // store return value on stack
 
     .end:
-    cpsie if    // Enable interrupts
+    cpsie if    // Enable interrupts if they were disabled at some point
     bx lr
 
+
+/* ==== SYSCALL TABLE ==== */
 call0:  bl syscall0
         b svc_end
 
@@ -48,11 +49,14 @@ call1:  bl syscall1
 call2:  bl syscall2
         b svc_end
 
+call3:  bl syscall3
+        b svc_end
 
 .align 4
 syscall_table:
     .word call0
     .word call1
     .word call2
+    .word call3
 .align 4
 table_addr: .word syscall_table
