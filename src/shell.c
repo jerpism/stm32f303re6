@@ -3,6 +3,7 @@
 #include <libc.h>
 #include <task.h>
 #include <gpio.h>
+#include <syscall.h>
 
 const char *prompt = "\r~$ ";
 

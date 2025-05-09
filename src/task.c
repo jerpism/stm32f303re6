@@ -46,9 +46,8 @@ struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_si
     return new;
 }
 
-void sched_add(struct task *task){
-    disable_irq();
 
+void sched_add(struct task *task){
     struct task_node *new = malloc(sizeof(struct task_node));
 
     if(head == NULL){
@@ -56,15 +55,14 @@ void sched_add(struct task *task){
         last = head;
     }
 
-
     new->task = task;
     new->next = last->next;
     last->next = new;
     last = new;
 
-    enable_irq();
 
 }
+
 
 void sched_remove(uint32_t pid){
     // If this was somehow called before we had any scheduler queue just return
@@ -72,8 +70,6 @@ void sched_remove(uint32_t pid){
     // Can't kill that which was never alive
     // and also don't kill pid 0, that's probably something important
     if(pid > nextpid || pid == 0){ return; }
-
-    disable_irq();
 
     struct task_node *curr = head;
     struct task_node *prev = head;
@@ -95,10 +91,9 @@ void sched_remove(uint32_t pid){
         curr = curr->next;
     }while(curr != head && curr != NULL);
 
-    enable_irq();
-
     return;
 }
+
 
 void ps(){
     if(head == NULL) return;
@@ -119,30 +114,21 @@ void ps(){
     }while (tmp != head);
 }
 
-void kill(uint32_t pid){
-    //I don't feel like parsing any input so just kill 1-20 every time, one of them will be a blinky hopefully
-    //0 should always be shell so don't kill that (not that you can anyways)
-    for(int i = 1; i <= 10; ++i){
-        sched_remove(i);
-    }
-}
 
 void blinkg(){
     uint32_t *pstack = malloc(sizeof(uint32_t) * 32);
     struct task *blinky = create_task(&blink, pstack, sizeof(uint32_t) * 32, "blinkg");
-    sched_add(blinky);
+    exec(blinky);
 }
 
 
 void blinkr(){
     uint32_t *pstack = malloc(sizeof(uint32_t) * 32);
     struct task *blinky = create_task(&blink_red, pstack, sizeof(uint32_t) * 32, "blinkr");
-    sched_add(blinky);
+    exec(blinky);
 }
 
 void sched_start(){
-    disable_irq();
-
     current = head;
     curr_task = current->task;
 
@@ -159,12 +145,12 @@ void sched_start(){
 
     asm volatile("ISB");
 
-    enable_irq();
 
 
     curr_task->handler();
 
 }
+
 
 void SysTick_Handler(void){
     curr_task = current->task;
