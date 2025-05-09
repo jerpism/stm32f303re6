@@ -12,7 +12,7 @@ void free(void*);
 void exec(struct task *);
 void kill(uint32_t);
 
-void memfault(uint32_t);
+void fault(const char*, uint32_t, uint32_t, uint32_t);
 
 
 

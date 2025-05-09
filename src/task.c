@@ -35,7 +35,7 @@ struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_si
     struct task *new = malloc(sizeof(struct task));
 
     if(new == NULL){
-        memfault(0);
+        fault("Got NULL at create_task:", (uint32_t)stack, stack_size, 0);
     }
 
     new->handler = handler;
@@ -55,7 +55,7 @@ void sched_add(struct task *task){
     struct task_node *new = malloc(sizeof(struct task_node));
 
     if(new == NULL){
-        memfault(1);
+        fault("Got NULL at sched_add:", (uint32_t)task, task->sp, 0);
     }
 
     if(head == NULL){

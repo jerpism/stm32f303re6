@@ -21,14 +21,25 @@ void syscall3(uint32_t pid){
     sched_remove(pid);
 }
 
-void syscall4(uint32_t n){
+void syscall4(const char *s, uint32_t a, uint32_t b, uint32_t c){
     asm volatile("cpsid if");
-    char tmp[4]; 
-    uart_sendstr("Fault at ");
-    itoa(n, tmp, 10);
+
+    char tmp[12];
+
+    uart_sendstr(s);
+    uart_sendstr("\r\n");
+
+    itoa(a, tmp, 16);
+    uart_sendstr(tmp);
+    uart_sendstr("\r\n");
+    
+    itoa(b, tmp, 16);
     uart_sendstr(tmp);
     uart_sendstr("\r\n");
 
+    itoa(c, tmp, 16);
+    uart_sendstr(tmp);
+    uart_sendstr("\r\n");
 
     while(1);
 }
@@ -72,6 +83,6 @@ void kill(uint32_t pid){
 }
 
 
-void memfault(uint32_t n){
-    syscall(4, n, 0, 0, 0);
+void fault(const char *s, uint32_t a, uint32_t b, uint32_t c){
+    syscall(4, (uint32_t)s, a, b, c);
 }
