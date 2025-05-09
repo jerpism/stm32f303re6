@@ -12,6 +12,8 @@ void free(void*);
 void exec(struct task *);
 void kill(uint32_t);
 
+void memfault(uint32_t);
+
 
 
 #endif /* SVC_H_ */
