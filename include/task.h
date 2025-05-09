@@ -3,7 +3,6 @@
 #include <stdint.h>
 
 #define MAX_TASKS 16
-#define NULL (void*)0
 
 enum task_status {
     TASK_STATUS_DISABLED = -2,
@@ -26,15 +25,16 @@ struct task_node{
 };
 
 
+struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_size, const char *name);
+
 void sched_start();
 void sched_add(struct task *task);
+void sched_remove(uint32_t pid);
 
 void ps();
-void kill(uint32_t pid);
 void blinkg();
 void blinkr();
 
-struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_size, const char *name);
 
 
 #endif /* TASK_H_ */
