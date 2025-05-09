@@ -4,7 +4,9 @@
 #include <usart.h>
 #include <libc.h>
 #include <gpio.h>
-#include <linkedListAllocator.h>
+
+#include <stdlib.h>
+#include <syscall.h>
 
 #define FREE_TASK(x)    free(x->task);  \
                         x->task = NULL; \
