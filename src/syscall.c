@@ -13,7 +13,8 @@ long syscall0(int n){
     return n*2;
 }
 
-long syscall1(){
+long syscall1(int n){
+    return n*4;
 }
 
 
@@ -37,7 +38,7 @@ long syscall(long num, long r0, long r1, long r2, long r3){
 
 
 long testcall(int n){
-    return syscall(0, n, 0, 0, 0);
+    return syscall(1, n, 0, 0, 0);
 }
 
 
