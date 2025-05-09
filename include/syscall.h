@@ -1,13 +1,17 @@
 #ifndef SVC_H_
 #define SVC_H_
+
 #include <stdint.h>
+#include <task.h>
 
 #define N_SYSCALL 3
 
 void *malloc(size_t);
 void free(void*);
 
-long testcall(long);
+void exec(struct task *);
+void kill(uint32_t);
+
 
 
 #endif /* SVC_H_ */
