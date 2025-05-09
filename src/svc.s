@@ -8,6 +8,8 @@
 .equ N_SYSCALL, 3
 
 SVCall_Handler:
+    cpsid if    // Disable interrupts
+
     /* See if we have a valid syscall # */
     cmp     r7, #0
     blt     .end
@@ -15,10 +17,10 @@ SVCall_Handler:
     bgt     .end
 
     /* We do. Check which SP was in use */
-    tst     lr, #4 
-    ite     eq
-    mrseq   r0, msp
-    mrsne   r0, psp
+    tst     lr, #4                  // check bit #4
+    ite     eq                      // was 1?
+    mrseq   r0, msp                 // MSP was in use
+    mrsne   r0, psp                 // Otherwise PSP (should usually be this)
 
     push    {r0, lr}                // save SP and EXC_RETURN
     ldm     r0,{r0-r3}              // Load arguments from stack frame
@@ -34,10 +36,14 @@ svc_end:
     stm     r12, {r0}               // store return value on stack
 
     .end:
+    cpsie if    // Enable interrupts
     bx lr
 
-call0: bl syscall0
-call1: 
+call0:  bl syscall0
+        b svc_end
+
+call1: bl syscall1
+
 b svc_end
 
 
