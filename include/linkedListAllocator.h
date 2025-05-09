@@ -19,8 +19,8 @@ static heapBlock *initialHeapBlock = NULL; // visible only when in the linkedLis
 void heapBlockInit(void); // init the starting initialHeapBlock 
 heapBlock* blockSplitter(heapBlock *block, size_t size); // splits the free block into two blocks, requested size and remaining one 
 heapBlock* findSuitableFree(heapBlock* block, size_t size); // scroll through heap blocks and find a free one with the right size 
-void* malloc(size_t size); // alloc command used by the user 
-void free(void* pointer); // free cmmand used by the user 
+void* malloc_internal(size_t size); // alloc command used by the user 
+void free_internal(void* pointer); // free cmmand used by the user 
 void combineFreeBlocks(void); //command that combines free blocks that it manages to find 
 
 #endif

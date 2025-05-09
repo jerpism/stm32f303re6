@@ -41,50 +41,50 @@ heapBlock* blockSplitter(heapBlock *block, size_t size){
  return block;
 }
 
-void* malloc(size_t size){
-      if(size == 0){
+void *malloc_internal(size_t size){
+    if(size == 0){
         return NULL;
-      }else if(initialHeapBlock == NULL){
-       heapBlockInit(); // init memory if it wasn't already
-      }
-      size = (((size + sizeof(heapBlock)) + 3) & ~3);
-      heapBlock* block = NULL;
-      
-      block = findSuitableFree(initialHeapBlock, size); // search always starts from the first block
-      if( block == NULL) {
-          return NULL;
-      }
+    }else if(initialHeapBlock == NULL){
+        heapBlockInit(); // init memory if it wasn't already
+    }
+    size = (((size + sizeof(heapBlock)) + 3) & ~3);
+    heapBlock* block = NULL;
 
-      block = blockSplitter(block, size);
-      if( block == NULL) {
-          return NULL;
-      }
+    block = findSuitableFree(initialHeapBlock, size); // search always starts from the first block
+    if( block == NULL) {
+        return NULL;
+    }
 
-      return (uint8_t*)block + sizeof(heapBlock); //return the pointer to the start of the space after the header
+    block = blockSplitter(block, size);
+    if( block == NULL) {
+        return NULL;
+    }
+
+    return (uint8_t*)block + sizeof(heapBlock); //return the pointer to the start of the space after the header
 }
 
 void combineFreeBlocks(void) {
-     heapBlock* scroller = initialHeapBlock; 
-     while(scroller != NULL){
-      if(scroller->free && scroller->nextFreeBlock != NULL && scroller->nextFreeBlock->free){
-        heapBlock* nextFree = scroller->nextFreeBlock;
-        scroller->size += nextFree->size; 
-        scroller->nextFreeBlock = nextFree->nextFreeBlock;
-        scroller->free = true;
-      }else{
-      scroller = scroller->nextFreeBlock;
-     }
-}
+    heapBlock* scroller = initialHeapBlock; 
+    while(scroller != NULL){
+        if(scroller->free && scroller->nextFreeBlock != NULL && scroller->nextFreeBlock->free){
+            heapBlock* nextFree = scroller->nextFreeBlock;
+            scroller->size += nextFree->size; 
+            scroller->nextFreeBlock = nextFree->nextFreeBlock;
+            scroller->free = true;
+        }else{
+            scroller = scroller->nextFreeBlock;
+        }
+    }
 }
 
-void free(void* pointer){ // find the header of the pointer and set it to free, call the combineFreeBlocks function to merge it with the previous block
-     if(pointer == NULL){
-       // do nothing 
-       return;
-     }
-     heapBlock* block = (heapBlock*)((uint8_t*)pointer-sizeof(heapBlock));
-     block->free = true;  
-     
-     combineFreeBlocks(); // check if any nearby blocks are free as well and combine them
+void free_internal(void* pointer){ // find the header of the pointer and set it to free, call the combineFreeBlocks function to merge it with the previous block
+    if(pointer == NULL){
+        // do nothing 
+        return;
+    }
+    heapBlock* block = (heapBlock*)((uint8_t*)pointer-sizeof(heapBlock));
+    block->free = true;  
+
+    combineFreeBlocks(); // check if any nearby blocks are free as well and combine them
 }
 
