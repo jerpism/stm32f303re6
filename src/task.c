@@ -8,10 +8,13 @@
 #include <stdlib.h>
 #include <syscall.h>
 
-#define FREE_TASK(x)    free(x->task);  \
-                        x->task = NULL; \
-                        free(x);        \
-                        x = NULL;       \
+
+#define FREE_TASK(x)    free(x->task->kmem);    \
+                        x->task->kmem = NULL;   \
+                        free(x->task);          \
+                        x->task = NULL;         \
+                        free(x);                \
+                        x = NULL;               \
 
 
 static volatile uint32_t nextpid = 0;
@@ -40,6 +43,7 @@ struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_si
 
     new->handler = handler;
     new->sp = (uint32_t)(stack + stack_size - 16);
+    new->kmem = stack;
     new->pid = nextpid++;
     new->name = name;
 
