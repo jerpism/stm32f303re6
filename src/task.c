@@ -14,7 +14,7 @@
                         free(x->task);          \
                         x->task = NULL;         \
                         free(x);                \
-                        x = NULL}(while(0))     \
+                        x = NULL;}(while(0))    \
 
 
 static volatile uint32_t nextpid = 0;
