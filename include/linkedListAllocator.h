@@ -14,7 +14,7 @@ typedef struct heapBlock{ // header for the memory blocks
 
 extern uint8_t _heap_start; // addresses are located in the linker script
 extern uint8_t _heap_end;
-static heapBlock *initialHeapBlock = NULL; // visible only when in the linkedListAllocator scope? 
+extern heapBlock *initialHeapBlock; // visible only when in the linkedListAllocator scope?
 
 void heapBlockInit(void); // init the starting initialHeapBlock 
 heapBlock* blockSplitter(heapBlock *block, size_t size); // splits the free block into two blocks, requested size and remaining one 
