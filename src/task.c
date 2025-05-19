@@ -9,12 +9,12 @@
 #include <syscall.h>
 
 
-#define FREE_TASK(x)    free(x->task->kmem);    \
+#define FREE_TASK(x)    do{ free(x->task->kmem);\
                         x->task->kmem = NULL;   \
                         free(x->task);          \
                         x->task = NULL;         \
                         free(x);                \
-                        x = NULL;               \
+                        x = NULL}(while(0))     \
 
 
 static volatile uint32_t nextpid = 0;
