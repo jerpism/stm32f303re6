@@ -44,6 +44,7 @@ struct task *create_task(void (*handler)(void), uint32_t *stack, size_t stack_si
     new->handler = handler;
     new->sp = (uint32_t)(stack + stack_size - 16);
     new->kmem = stack;
+    new->memsz = stack_size * 4;
     new->pid = nextpid++;
     new->name = name;
 
@@ -111,8 +112,8 @@ void ps(){
     if(head == NULL) return;
 
     struct task_node *tmp = head;
-    char c[3];
-    uart_sendstr("pid\tname\n\n\r");
+    char c[20];
+    uart_sendstr("pid\tname\tmem\t\tsize (B)\n\n\r");
 
     do{
         if(tmp->task == NULL) break;
@@ -120,6 +121,12 @@ void ps(){
         uart_sendstr(c);
         uart_send('\t');
         uart_sendstr(tmp->task->name);
+        uart_sendstr("\t0x");
+        itoa((uint32_t)(tmp->task->kmem), c, 16);
+        uart_sendstr(c);
+        uart_send('\t');
+        itoa(tmp->task->memsz, c, 10);
+        uart_sendstr(c);
         uart_sendstr("\r\n");
 
         tmp = tmp->next;

@@ -16,6 +16,7 @@ struct task{
     void (*handler)(void);
     volatile enum task_status status;
     uint32_t *kmem;
+    size_t memsz;
     uint32_t pid;
     const char *name;
 };
